@@ -1,4 +1,4 @@
-# CatCart
+# WildCart
 Group number 2
 
 ## Group Roles
