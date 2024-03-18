@@ -1,9 +1,9 @@
 import mongoose from "mongoose";
 
-interface Post extends mongoose.Document {
+export interface Post extends mongoose.Document {
   name: string;
   description: string;
-  picture: string;
+  picture: Buffer;
   seller_id: mongoose.Types.ObjectId;
   status: string;
 }
