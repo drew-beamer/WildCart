@@ -8,19 +8,7 @@ import {
 } from "@/components/ui/card";
 import { Post } from "@/models/Post";
 import Image from "next/image";
-import { Button } from "../ui/button";
-
-/**
- * Temporary logic until we know how we're encoding the picture, currently just decodes a buffer
- * that contains a utf-8 string representing the file path
- * @param picture
- * @returns
- */
-function decodePicture(filepathBuffer: Buffer) {
-  const utf8Decoder = new TextDecoder("utf-8");
-  return utf8Decoder.decode(filepathBuffer);
-}
-
+import { Button } from "@/components/ui/button";
 /**
  * Responsible for rendering a user display, showing the user's avatar and name.
  *
@@ -51,27 +39,29 @@ function UserDisplay() {
  * @returns a card that represents a post, for use in the market page
  */
 export default function PostCard({ post }: Readonly<{ post: Post }>) {
-  const picture = decodePicture(post.picture);
+  const imageUrl = `data:image/jpeg;base64,${post.picture.toString("base64")}`;
 
   return (
-    <Card>
-      <CardHeader className="p-0">
+    <Card className="flex flex-col">
+      <CardHeader className="p-0 grow">
         <div className="relative h-48 w-full rounded-lg">
           <Image
-            src={picture}
+            src={imageUrl}
             className="object-cover rounded-t-lg"
             alt="Post Image"
             fill
           />
         </div>
-        <div className="px-4 pt-4">
+        <div className="px-4 pt-2 space-y-2">
           <CardTitle>{post.name}</CardTitle>
-          <CardDescription>{post.description}</CardDescription>
+          <UserDisplay />
+          <CardDescription className="line-clamp-3">
+            {post.description}
+          </CardDescription>
         </div>
       </CardHeader>
-      <CardContent className="px-4 pt-4">
-        <UserDisplay />
-        <div className="grid grid-cols-2 gap-2 mt-4">
+      <CardContent>
+        <div className=" grid grid-cols-2 gap-2 mt-4">
           <Button>Offer</Button>
           <Button variant="outline">Details</Button>
         </div>
