@@ -4,10 +4,11 @@ interface Offer extends mongoose.Document {
   post_id: mongoose.Types.ObjectId;
   seller_id: mongoose.Types.ObjectId;
   buyer_id: mongoose.Types.ObjectId;
-  name: String;
-  description: String;
+  name: string;
+  description: string;
   picture: Buffer;
-  status: String;
+  status: string;
+  condition: "Used" | "New";
 }
 
 const OfferSchema = new mongoose.Schema({
@@ -18,6 +19,7 @@ const OfferSchema = new mongoose.Schema({
   description: { type: String, required: true },
   picture: { type: Buffer, required: true },
   status: { type: String, required: true },
+  condition: { type: String, required: true },
 });
 
 export default mongoose.models.Offer ||
