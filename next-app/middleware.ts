@@ -1,6 +1,6 @@
 //initialize NextAuth.js with the authConfig object and exporting the auth property.
 import NextAuth from 'next-auth';
-import { authConfig } from './auth.config';
+import { authConfig } from './src/lib/auth.config';
  
 export default NextAuth(authConfig).auth;
  
