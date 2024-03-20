@@ -1,9 +1,19 @@
 "use server";
 import { z } from "zod";
 import Post from "@/models/Post";
+import mongoose from "mongoose";
 
-export function createPost(formData: FormData) {
+export async function createPost(formData: FormData) {
   const validateField = createPostForm.safeParse({
+    name: formData.get("name"),
+    description: formData.get("description"),
+    category: formData.get("category"),
+    price: formData.get("price"),
+    trade_mode: formData.get("trade_mode"),
+    picture: formData.get("picture"),
+    condition: formData.get("condition"),
+  });
+  console.log({
     name: formData.get("name"),
     description: formData.get("description"),
     category: formData.get("category"),
@@ -16,16 +26,25 @@ export function createPost(formData: FormData) {
     return { error: validateField.error.flatten().fieldErrors };
   }
 
-  Post.create({
-    name: validateField.data.name,
-    description: validateField.data.description,
-    category: validateField.data.category,
-    price: validateField.data.price,
-    trade_mode: validateField.data.trade_mode,
-    picture: validateField.data.picture,
-    condition: validateField.data.condition,
-    status: "Active",
-  });
+  try {
+    await Post.create({
+      name: validateField.data.name,
+      description: validateField.data.description,
+      category: validateField.data.category,
+      price: validateField.data.price,
+      trade_mode: validateField.data.trade_mode,
+      picture: Buffer.from(validateField.data.picture.split(",")[1], "base64"),
+      condition: validateField.data.condition,
+      seller_id: new mongoose.Types.ObjectId(),
+      status: "Active",
+    });
+  } catch (error) {
+    console.log(error);
+    return {
+      error: { server: "Validation succeeded but failed to create post" },
+    };
+  }
+  return { success: true };
 }
 
 const createPostForm = z.object({

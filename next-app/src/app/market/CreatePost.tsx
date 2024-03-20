@@ -20,18 +20,18 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ArrowLeftRightIcon, DollarSignIcon } from "lucide-react";
-import { createPost } from "./actions";
+import { createPost } from "./action";
 import { compressImage } from "@/lib/image-utils";
 
 const exchangeMethods = [
   {
     label: "Trade",
-    value: "trade",
+    value: "Trade",
     icon: <ArrowLeftRightIcon className="h-4" />,
   },
   {
     label: "Sell",
-    value: "sell",
+    value: "Sell",
     icon: <DollarSignIcon className="h-4" />,
   },
 ];
@@ -65,11 +65,11 @@ export default function CreatePost() {
               });
               formData.set("picture", compressedDataURL);
             }
-            await createPost(formData);
+            console.log(await createPost(formData));
           }}>
           <div>
             <Label htmlFor="title">Method</Label>
-            <Select name="method">
+            <Select name="trade_mode">
               <SelectTrigger>
                 <SelectValue placeholder="Select a method" />
               </SelectTrigger>
@@ -119,6 +119,20 @@ export default function CreatePost() {
             <div>
               <Label htmlFor="picture">Picture*</Label>
               <Input type="file" name="picture" accept="image/*" required />
+            </div>
+            <div>
+              <Label htmlFor="title">Condition*</Label>
+              <Select name="condition" required>
+                <SelectTrigger>
+                  <SelectValue placeholder="Condition of Item" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem value="New">New</SelectItem>
+                    <SelectItem value="Used">Used</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <Label htmlFor="description">Description</Label>
