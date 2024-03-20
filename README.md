@@ -28,7 +28,7 @@ created via mongoose (one is required for the database to exist).
 
 Now, create a file called `.env.local` in the root directory of the project. This file currently contains the following variables:
 
-- `MONOGO_URI`: The URI for the MongoDB database. This should be `mongodb://localhost:27017/wildcart` if you are using a local database, and followed the instructions above.
+- `MONGODB_URI`: The URI for the MongoDB database. This should be `mongodb://localhost:27017/wildcart` if you are using a local database, and followed the instructions above.
 
 #### Running the Server
 
