@@ -8,7 +8,7 @@ export interface Post extends mongoose.Document {
   trade_mode: "Sell" | "Trade";
   picture: Buffer;
   seller_id: mongoose.Types.ObjectId;
-  status: string;
+  status: "Active" | "Closed" | "Removed";
   condition: "Used" | "New";
 }
 
