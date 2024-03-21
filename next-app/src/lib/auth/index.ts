@@ -34,7 +34,7 @@ export const {
       async authorize(credentials) {
         const parsedCredentials = z
           .object({
-            email: z.string().email(),
+            email: z.string().email().endsWith("@davidson.edu"),
             password: z.string().min(6),
           })
           .safeParse(credentials);
@@ -44,6 +44,7 @@ export const {
         }
 
         const parsedData = parsedCredentials.data;
+
         const user = await getUser(parsedData.email);
         if (!user) {
           return null;

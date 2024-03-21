@@ -39,6 +39,7 @@ async function createAccount(formData: FormData) {
   const parsedData = parsedCredentials.data;
   const hashedPassword = bcrypt.hash(parsedData.password, 12);
 
+  await dbConnect();
   await User.create({
     name: parsedData.name,
     email: parsedData.email,
