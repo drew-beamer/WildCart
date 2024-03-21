@@ -1,9 +1,15 @@
 "use server";
-import { z } from "zod";
 import Post from "@/models/Post";
 import mongoose from "mongoose";
+import { auth } from "@/lib/auth";
+import { z } from "zod";
 
 export async function createPost(formData: FormData) {
+  const session = await auth();
+  if (!session || !session.user) {
+    return { error: "Unauthorized" };
+  }
+  const user = session.user;
   const validateField = createPostForm.safeParse({
     name: formData.get("name"),
     description: formData.get("description"),
@@ -13,15 +19,7 @@ export async function createPost(formData: FormData) {
     picture: formData.get("picture"),
     condition: formData.get("condition"),
   });
-  console.log({
-    name: formData.get("name"),
-    description: formData.get("description"),
-    category: formData.get("category"),
-    price: formData.get("price"),
-    trade_mode: formData.get("trade_mode"),
-    picture: formData.get("picture"),
-    condition: formData.get("condition"),
-  });
+
   if (!validateField.success) {
     return { error: validateField.error.flatten().fieldErrors };
   }
@@ -35,7 +33,7 @@ export async function createPost(formData: FormData) {
       trade_mode: validateField.data.trade_mode,
       picture: Buffer.from(validateField.data.picture.split(",")[1], "base64"),
       condition: validateField.data.condition,
-      seller_id: new mongoose.Types.ObjectId(),
+      seller_id: new mongoose.Types.ObjectId(user.id),
       status: "Active",
     });
   } catch (error) {
