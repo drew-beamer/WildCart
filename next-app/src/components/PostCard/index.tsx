@@ -9,6 +9,7 @@ import {
 import { Post } from "@/models/Post";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { PostDisplay } from "@/app/market/page";
 /**
  * Responsible for rendering a user display, showing the user's avatar and name.
  *
@@ -16,14 +17,18 @@ import { Button } from "@/components/ui/button";
  *
  * @returns a user display, for use in the post card
  */
-function UserDisplay() {
+function UserDisplay({ sellerName }: { sellerName: string }) {
   return (
     <div className="flex items-center space-x-2 leading-tight">
       <Avatar>
-        <AvatarFallback>AV</AvatarFallback>
+        <AvatarFallback>
+          {sellerName
+            .split(" ")
+            .reduce((initials, name) => initials + name[0], "")}
+        </AvatarFallback>
       </Avatar>
       <div>
-        <p>John Doe</p>
+        <p>{sellerName}</p>
         <p className="text-xs">Level 40</p>
       </div>
     </div>
@@ -38,7 +43,7 @@ function UserDisplay() {
  *
  * @returns a card that represents a post, for use in the market page
  */
-export default function PostCard({ post }: Readonly<{ post: Post }>) {
+export default function PostCard({ post }: Readonly<{ post: PostDisplay }>) {
   const imageUrl = `data:image/jpeg;base64,${post.picture.toString("base64")}`;
 
   return (
@@ -54,7 +59,7 @@ export default function PostCard({ post }: Readonly<{ post: Post }>) {
         </div>
         <div className="px-4 pt-2 space-y-2">
           <CardTitle>{post.name}</CardTitle>
-          <UserDisplay />
+          <UserDisplay sellerName={post.seller_name} />
           <CardDescription className="line-clamp-3">
             {post.description}
           </CardDescription>
