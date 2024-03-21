@@ -1,7 +1,6 @@
-// import AcmeLogo from '@/app/ui/acme-logo';
-import { Button } from "@/components/ui/button";
 import LoginForm from "@/components/ui/login-form";
 import { auth, signOut } from "@/lib/auth";
+import { Button } from "@/components/ui/button";
 
 export default async function LoginPage() {
   const session = await auth();
@@ -12,9 +11,9 @@ export default async function LoginPage() {
       <div className="relative mx-auto flex w-full max-w-[400px] flex-col space-y-2.5 p-4 md:-mt-32">
         Hi there {user?.name?.split(" ")[0] ?? "stranger"}
         <div className="flex h-20 w-full items-end rounded-lg bg-blue-500 p-3 md:h-36">
-          <div className="w-32 text-white md:w-36">{/* <AcmeLogo /> */}</div>
+          <div className="w-32 text-white md:w-36"></div>
         </div>
-        <LoginForm /> {/*import: will be updated */}
+        <LoginForm />
         <form
           action={async () => {
             "use server";
