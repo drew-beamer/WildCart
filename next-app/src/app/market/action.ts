@@ -2,7 +2,8 @@
 import Post from "@/models/Post";
 import mongoose from "mongoose";
 import { auth } from "@/lib/auth";
-import { z } from "zod";
+import { string, z } from "zod";
+import { containsBannedWords } from "@/lib/wordChecker";
 
 export async function createPost(formData: FormData) {
   const session = await auth();
@@ -10,6 +11,7 @@ export async function createPost(formData: FormData) {
     return { error: "Unauthorized" };
   }
   const user = session.user;
+
   const validateField = createPostForm.safeParse({
     name: formData.get("name"),
     description: formData.get("description"),
@@ -21,6 +23,7 @@ export async function createPost(formData: FormData) {
   });
 
   if (!validateField.success) {
+    console.log(validateField.error.flatten().fieldErrors);
     return { error: validateField.error.flatten().fieldErrors };
   }
 
@@ -46,8 +49,12 @@ export async function createPost(formData: FormData) {
 }
 
 const createPostForm = z.object({
-  name: z.string(),
-  description: z.string(),
+  name: z.string().refine((val) => !containsBannedWords(val), {
+    message: "Name contains banned words",
+  }),
+  description: z.string().refine((val) => !containsBannedWords(val), {
+    message: "Description contains banned words",
+  }),
   category: z.string(),
   price: z.coerce.number().min(0),
   trade_mode: z.string().refine((val) => ["Sell", "Trade"].includes(val)),

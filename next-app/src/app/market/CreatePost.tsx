@@ -1,5 +1,4 @@
 "use client";
-
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
@@ -22,6 +21,7 @@ import {
 import { ArrowLeftRightIcon, DollarSignIcon } from "lucide-react";
 import { createPost } from "./action";
 import { compressImage } from "@/lib/image-utils";
+import { useState } from "react";
 
 const exchangeMethods = [
   {
@@ -36,7 +36,24 @@ const exchangeMethods = [
   },
 ];
 
+interface ServerErrors {
+  name?: string;
+  description?: string;
+}
 export default function CreatePost() {
+  const [serverErrors, setServerErrors] = useState<ServerErrors>({});
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const response = await createPost(formData);
+
+    if (response.error) {
+      setServerErrors(response as ServerErrors);
+    } else {
+      setServerErrors({});
+    }
+  };
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -66,7 +83,9 @@ export default function CreatePost() {
               formData.set("picture", compressedDataURL);
             }
             console.log(await createPost(formData));
-          }}>
+          }}
+          onSubmit={handleSubmit}
+        >
           <div>
             <Label htmlFor="title">Method</Label>
             <Select name="trade_mode">
@@ -79,7 +98,8 @@ export default function CreatePost() {
                     <SelectItem
                       className="hover:cursor-pointer"
                       key={method.value}
-                      value={method.value}>
+                      value={method.value}
+                    >
                       <div className="flex items-center">
                         {method.label}{" "}
                         <span className="mr-2">{method.icon}</span>
@@ -113,7 +133,7 @@ export default function CreatePost() {
               </Select>
             </div>
             <div>
-              <Label htmlFor="price">Approximate Value</Label>
+              <Label htmlFor="price">Approximate Value*</Label>
               <Input type="number" name="price" required />
             </div>
             <div>
@@ -138,6 +158,15 @@ export default function CreatePost() {
               <Label htmlFor="description">Description</Label>
               <Textarea name="description" required />
             </div>
+          </div>
+          <div
+            className="flex h-8 items-end space-x-1"
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            {serverErrors && (
+              <p className="text-sm text-red-500">{serverErrors.name}</p>
+            )}
           </div>
           <Button className="mt-2" type="submit">
             Create Post
