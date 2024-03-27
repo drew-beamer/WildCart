@@ -41,21 +41,47 @@ interface ServerErrors {
   description?: string;
 }
 export default function CreatePost() {
-  const [serverErrors, setServerErrors] = useState<ServerErrors>({});
+  const [error, setError] = useState<ServerErrors | null>(null);
+
+  const handleOpenChange = (open: boolean) => {
+    if (open) {
+      setError(null);
+    }
+  };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    const response = await createPost(formData);
 
-    if (response.error) {
-      setServerErrors(response as ServerErrors);
+    const picture = formData.get("picture");
+    if (picture instanceof File) {
+      const compressedDataURL = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const dataURL = event.target?.result;
+          if (typeof dataURL === "string") {
+            compressImage(dataURL, 500, 500, 0.3, resolve);
+          }
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(picture);
+      });
+      formData.set("picture", compressedDataURL);
+    }
+
+    const result = await createPost(formData);
+    if (result.error) {
+      // Assuming result.error is a string for simplicity; adjust as needed
+      setError(result.error as ServerErrors);
     } else {
-      setServerErrors({});
+      // Reset error and possibly redirect or clear the form
+      setError(null);
+      console.log("Post created successfully");
     }
   };
+
   return (
-    <Dialog>
+    <Dialog onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button>Create Post</Button>
       </DialogTrigger>
@@ -63,31 +89,9 @@ export default function CreatePost() {
         <DialogHeader>
           <DialogTitle>Create a Post</DialogTitle>
         </DialogHeader>
-        <form
-          className="space-y-4"
-          action={async (formData: FormData) => {
-            const picture = formData.get("picture");
-            if (picture instanceof File) {
-              // ChatGPT & Copilot greatly helped in generating this code
-              // Uses canvas trick to compress image, then sets the compressed data URL
-              const compressedDataURL = await new Promise<string>((resolve) => {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                  const dataURL = event.target?.result;
-                  if (typeof dataURL === "string") {
-                    compressImage(dataURL, 500, 500, 0.3, resolve);
-                  }
-                };
-                reader.readAsDataURL(picture);
-              });
-              formData.set("picture", compressedDataURL);
-            }
-            console.log(await createPost(formData));
-          }}
-          onSubmit={handleSubmit}
-        >
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="title">Method</Label>
+            <Label htmlFor="title">Method*</Label>
             <Select name="trade_mode">
               <SelectTrigger>
                 <SelectValue placeholder="Select a method" />
@@ -155,17 +159,20 @@ export default function CreatePost() {
               </Select>
             </div>
             <div>
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description">Description*</Label>
               <Textarea name="description" required />
             </div>
           </div>
           <div
-            className="flex h-8 items-end space-x-1"
+            className="flex flex-col space-y-1"
             aria-live="polite"
             aria-atomic="true"
           >
-            {serverErrors && (
-              <p className="text-sm text-red-500">{serverErrors.name}</p>
+            {error?.name && (
+              <p className="text-sm text-red-500">{error.name}</p>
+            )}
+            {error?.description && (
+              <p className="text-sm text-red-500">{error.description}</p>
             )}
           </div>
           <Button className="mt-2" type="submit">
