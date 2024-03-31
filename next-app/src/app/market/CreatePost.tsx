@@ -1,5 +1,4 @@
 "use client";
-
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
@@ -22,6 +21,7 @@ import {
 import { ArrowLeftRightIcon, DollarSignIcon } from "lucide-react";
 import { createPost } from "./action";
 import { compressImage } from "@/lib/image-utils";
+import { useState } from "react";
 
 const exchangeMethods = [
   {
@@ -36,9 +36,52 @@ const exchangeMethods = [
   },
 ];
 
+interface ServerErrors {
+  name?: string;
+  description?: string;
+}
 export default function CreatePost() {
+  const [error, setError] = useState<ServerErrors | null>(null);
+
+  const handleOpenChange = (open: boolean) => {
+    if (open) {
+      setError(null);
+    }
+  };
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+
+    const picture = formData.get("picture");
+    if (picture instanceof File) {
+      const compressedDataURL = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const dataURL = event.target?.result;
+          if (typeof dataURL === "string") {
+            compressImage(dataURL, 500, 500, 0.3, resolve);
+          }
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(picture);
+      });
+      formData.set("picture", compressedDataURL);
+    }
+
+    const result = await createPost(formData);
+    if (result.error) {
+      // Assuming result.error is a string for simplicity; adjust as needed
+      setError(result.error as ServerErrors);
+    } else {
+      // Reset error and possibly redirect or clear the form
+      setError(null);
+      console.log("Post created successfully");
+    }
+  };
+
   return (
-    <Dialog>
+    <Dialog onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button>Create Post</Button>
       </DialogTrigger>
@@ -46,29 +89,9 @@ export default function CreatePost() {
         <DialogHeader>
           <DialogTitle>Create a Post</DialogTitle>
         </DialogHeader>
-        <form
-          className="space-y-4"
-          action={async (formData: FormData) => {
-            const picture = formData.get("picture");
-            if (picture instanceof File) {
-              // ChatGPT & Copilot greatly helped in generating this code
-              // Uses canvas trick to compress image, then sets the compressed data URL
-              const compressedDataURL = await new Promise<string>((resolve) => {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                  const dataURL = event.target?.result;
-                  if (typeof dataURL === "string") {
-                    compressImage(dataURL, 500, 500, 0.3, resolve);
-                  }
-                };
-                reader.readAsDataURL(picture);
-              });
-              formData.set("picture", compressedDataURL);
-            }
-            console.log(await createPost(formData));
-          }}>
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="title">Method</Label>
+            <Label htmlFor="title">Method*</Label>
             <Select name="trade_mode">
               <SelectTrigger>
                 <SelectValue placeholder="Select a method" />
@@ -79,7 +102,8 @@ export default function CreatePost() {
                     <SelectItem
                       className="hover:cursor-pointer"
                       key={method.value}
-                      value={method.value}>
+                      value={method.value}
+                    >
                       <div className="flex items-center">
                         {method.label}{" "}
                         <span className="mr-2">{method.icon}</span>
@@ -113,7 +137,7 @@ export default function CreatePost() {
               </Select>
             </div>
             <div>
-              <Label htmlFor="price">Approximate Value</Label>
+              <Label htmlFor="price">Approximate Value*</Label>
               <Input type="number" name="price" required />
             </div>
             <div>
@@ -135,9 +159,21 @@ export default function CreatePost() {
               </Select>
             </div>
             <div>
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description">Description*</Label>
               <Textarea name="description" required />
             </div>
+          </div>
+          <div
+            className="flex flex-col space-y-1"
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            {error?.name && (
+              <p className="text-sm text-red-500">{error.name}</p>
+            )}
+            {error?.description && (
+              <p className="text-sm text-red-500">{error.description}</p>
+            )}
           </div>
           <Button className="mt-2" type="submit">
             Create Post
