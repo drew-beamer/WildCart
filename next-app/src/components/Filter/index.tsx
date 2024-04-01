@@ -30,7 +30,14 @@ const exchangeMethods = [
   },
 ];
 
-export default function Filter() {
+export default function Filter({
+  onCategoryChange,
+}: {
+  onCategoryChange: (newValue: string) => void;
+}) {
+  const handleCategoryChange = (newValue: string) => {
+    onCategoryChange(newValue);
+  };
   return (
     <div className="flex flex-col md:flex-row gap-8 mr-10">
       <div className="w-full">
@@ -60,7 +67,10 @@ export default function Filter() {
 
         <div className="mb-6">
           <h4 className="typography grow my-1">Category</h4>
-          <Select defaultValue="All">
+          <Select
+            defaultValue="All"
+            onValueChange={(value) => handleCategoryChange(value)}
+          >
             <SelectTrigger id="filter1">
               <SelectValue placeholder="Select an option" />
             </SelectTrigger>

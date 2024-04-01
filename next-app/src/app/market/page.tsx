@@ -1,11 +1,13 @@
+"use client";
 import PostCard from "@/components/PostCard";
 import dbConnect from "@/lib/dbConnect";
 import Post from "@/models/Post";
 import CreatePost from "./CreatePost";
-import { PipelineStage } from "mongoose";
+import { PipelineStage, set } from "mongoose";
 import Filter from "@/components/Filter";
+import React, { useState, useEffect } from "react";
 
-const getPostSellerNames: PipelineStage[] = [
+const getPost: PipelineStage[] = [
   {
     $lookup: {
       from: "users",
@@ -57,14 +59,42 @@ export interface PostDisplay {
   seller_name: string;
 }
 
+const fetchFilteredPosts = async (selectedCategory: string) => {
+  // Fetch posts based on selectedCategory
+  if (selectedCategory === "All") {
+    const allPosts = await Post.aggregate<PostDisplay>(getPost);
+    return allPosts;
+  }
+  const filteredPosts = await Post.aggregate<PostDisplay>([
+    {
+      $match: {
+        category: selectedCategory,
+      },
+    },
+    ...getPost,
+  ]);
+
+  return filteredPosts;
+};
+
 export default async function MarketPage() {
   await dbConnect();
-  const testPosts = await Post.aggregate<PostDisplay>(getPostSellerNames);
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedPost, setSelectedPost] = useState<PostDisplay[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const filteredPosts = await fetchFilteredPosts(selectedCategory);
+      setSelectedPost(filteredPosts);
+    };
+
+    fetchData();
+  }, [selectedCategory]);
 
   return (
     <div className="flex max-w-7xl mx-auto px-4">
       <aside className="w-1/6 my-20 mr-5">
-        <Filter />
+        <Filter onCategoryChange={setSelectedCategory} />
       </aside>
       <main className="flex-grow">
         <header className="flex my-4">
@@ -72,7 +102,7 @@ export default async function MarketPage() {
           <CreatePost />
         </header>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {testPosts.map((post) => (
+          {selectedPost.map((post) => (
             <PostCard key={post._id} post={Object.freeze(post)} />
           ))}
         </div>
