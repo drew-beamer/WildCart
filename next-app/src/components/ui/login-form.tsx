@@ -24,7 +24,8 @@ export default function LoginForm() {
           <div>
             <label
               className="mb-3 mt-5 block text-xs font-medium text-gray-900"
-              htmlFor="email">
+              htmlFor="email"
+            >
               Email
             </label>
             <div className="relative">
@@ -42,7 +43,8 @@ export default function LoginForm() {
           <div className="mt-4">
             <label
               className="mb-3 mt-5 block text-xs font-medium text-gray-900"
-              htmlFor="password">
+              htmlFor="password"
+            >
               Password
             </label>
             <div className="relative">
@@ -63,7 +65,8 @@ export default function LoginForm() {
         <div
           className="flex h-8 items-end space-x-1"
           aria-live="polite"
-          aria-atomic="true">
+          aria-atomic="true"
+        >
           {errorMessage && (
             <>
               {/* <ExclamationCircleIcon className="h-5 w-5 text-red-500" /> */}
