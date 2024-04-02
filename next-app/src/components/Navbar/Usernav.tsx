@@ -11,6 +11,7 @@ import {
 import { auth, signOut } from "@/lib/auth";
 import { LockIcon, UserIcon } from "lucide-react";
 import Link from "next/link";
+import { GoogleSignInButton } from "./GoogleButton";
 
 export async function UserNav() {
   const session = await auth();
@@ -61,8 +62,6 @@ export async function UserNav() {
       </DropdownMenuContent>
     </DropdownMenu>
   ) : (
-    <Link className="text-sm font-medium" href="/login">
-      Login
-    </Link>
+    <GoogleSignInButton />
   );
 }

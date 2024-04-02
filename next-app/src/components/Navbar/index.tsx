@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import Sidebar from "./Sidebar";
 import { UserNav } from "./Usernav";
 import { PackageIcon, SearchIcon, ShoppingCartIcon } from "lucide-react";
+import { GoogleSignInButton} from "./GoogleButton";
 
 function Component() {
   return (

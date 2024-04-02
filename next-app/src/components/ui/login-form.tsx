@@ -9,7 +9,7 @@ import { inter } from "./fonts";
 // import { ArrowRightIcon } from '@heroicons/react/20/solid';
 import { Button } from "./button";
 import { useFormState, useFormStatus } from "react-dom";
-import { authenticate } from "@/app/login/actions";
+import { authenticate } from "../../app/login/actions";
 
 export default function LoginForm() {
   const [errorMessage, dispatch] = useFormState(authenticate, undefined);
@@ -61,6 +61,7 @@ export default function LoginForm() {
             </div>
           </div>
         </div>
+        
         <LoginButton />
         <div
           className="flex h-8 items-end space-x-1"
@@ -81,7 +82,7 @@ export default function LoginForm() {
 
 function LoginButton() {
   const { pending } = useFormStatus();
-
+ 
   return (
     <Button className="mt-4 w-full" aria-disabled={pending}>
       Log in
