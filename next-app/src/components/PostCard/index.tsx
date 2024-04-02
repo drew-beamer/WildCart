@@ -66,9 +66,11 @@ export default function PostCard({ post }: Readonly<{ post: PostDisplay }>) {
         </div>
       </CardHeader>
       <CardContent>
-        <div className=" grid grid-cols-2 gap-2 mt-4">
-          <Button>Offer</Button>
-          <Button variant="outline">Details</Button>
+        <div className="grid grid-cols-2 gap-2 mt-4">
+          <Button role="button">Offer</Button>
+          <Button role="button" variant="outline">
+            Details
+          </Button>
         </div>
       </CardContent>
     </Card>
