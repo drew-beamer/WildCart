@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { cn } from "@/lib/utils";
-import Navbar from '@/components/Navbar'; 
 import "./globals.css";
+import Providers from "@/components/Providers";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
   title: "Wildcart",
-  description: "Something here...",
+  description: "A Davidson project",
 };
 
 export default function RootLayout({
@@ -17,15 +17,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
+    <Providers>
     <html lang="en">
       <body
         className={cn(
           "min-h-screen bg-background font-sans antialiased",
           inter.variable
         )}>
-        <Navbar/>
+          {children}
         {children}
       </body>
     </html>
+    </Providers>
   );
 }
