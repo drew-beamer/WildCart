@@ -7,7 +7,7 @@ interface Offer extends mongoose.Document {
   name: string;
   description: string;
   picture: Buffer;
-  status: string;
+  status: "Active" | "Closed" | "Removed";
   condition: "Used" | "New";
 }
 

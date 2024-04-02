@@ -9,7 +9,8 @@ import {
 import { Post } from "@/models/Post";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { PostDisplay } from "../../app/market/page";
+import { PostDisplay } from "@/app/market/page";
+import CreateOffer from "@/app/market/CreateOffer";
 /**
  * Responsible for rendering a user display, showing the user's avatar and name.
  *
@@ -67,7 +68,7 @@ export default function PostCard({ post }: Readonly<{ post: PostDisplay }>) {
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 gap-2 mt-4">
-          <Button role="button">Offer</Button>
+          <CreateOffer postId={post._id.toString()} sellerId={post.seller_id.toString()} />
           <Button role="button" variant="outline">
             Details
           </Button>
