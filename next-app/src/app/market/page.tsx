@@ -1,11 +1,9 @@
-"use client";
 import PostCard from "@/components/PostCard";
 import dbConnect from "@/lib/dbConnect";
 import Post from "@/models/Post";
 import CreatePost from "./CreatePost";
 import { PipelineStage, set } from "mongoose";
 import Filter from "@/components/Filter";
-import React, { useState, useEffect } from "react";
 
 const getPost: PipelineStage[] = [
   {
@@ -59,42 +57,98 @@ export interface PostDisplay {
   seller_name: string;
 }
 
-const fetchFilteredPosts = async (selectedCategory: string) => {
-  // Fetch posts based on selectedCategory
-  if (selectedCategory === "All") {
-    const allPosts = await Post.aggregate<PostDisplay>(getPost);
-    return allPosts;
-  }
-  const filteredPosts = await Post.aggregate<PostDisplay>([
-    {
+const getFilteredPosts = async (
+  option: string,
+  category: string,
+  condition: string,
+  lowestPrice: number,
+  highestPrice: number
+) => {
+  let pipeline = getPost;
+  if (category != "") {
+    pipeline = pipeline.filter(
+      (stage) => !("$match" in stage && "category" in stage.$match)
+    );
+    pipeline.push({
       $match: {
-        category: selectedCategory,
+        category: category,
       },
-    },
-    ...getPost,
-  ]);
-
+    });
+  }
+  if (option != "") {
+    pipeline = pipeline.filter(
+      (stage) => !("$match" in stage && "option" in stage.$match)
+    );
+    pipeline.push({
+      $match: {
+        trade_mode: option,
+      },
+    });
+  }
+  if (condition != "") {
+    pipeline = pipeline.filter(
+      (stage) => !("$match" in stage && "condition" in stage.$match)
+    );
+    pipeline.push({
+      $match: {
+        condition: condition,
+      },
+    });
+  }
+  if (lowestPrice !== 0 && !isNaN(lowestPrice)) {
+    pipeline = pipeline.filter(
+      (stage) => !("$match" in stage && "lowestPrice" in stage.$match)
+    );
+    pipeline.push({
+      $match: {
+        price: { $gte: lowestPrice },
+      },
+    });
+  }
+  if (highestPrice !== 0 && !isNaN(highestPrice)) {
+    pipeline = pipeline.filter(
+      (stage) => !("$match" in stage && "highestPrice" in stage.$match)
+    );
+    pipeline.push({
+      $match: {
+        price: { $lte: highestPrice },
+      },
+    });
+  }
+  const filteredPosts = await Post.aggregate<PostDisplay>(pipeline);
   return filteredPosts;
 };
 
-export default async function MarketPage() {
+export default async function MarketPage({
+  searchParams,
+}: {
+  searchParams?: {
+    category?: string;
+    option?: string;
+    condition?: string;
+    lowestPrice?: string;
+    highestPrice?: string;
+  };
+}) {
   await dbConnect();
-  const [selectedCategory, setSelectedCategory] = useState("All");
-  const [selectedPost, setSelectedPost] = useState<PostDisplay[]>([]);
+  const category = searchParams?.category || "";
+  const option = searchParams?.option || "";
+  const condition = searchParams?.condition || "";
+  const lowestPrice = parseInt(searchParams?.lowestPrice || "0", 10);
+  const highestPrice = parseInt(searchParams?.highestPrice || "100", 10);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const filteredPosts = await fetchFilteredPosts(selectedCategory);
-      setSelectedPost(filteredPosts);
-    };
-
-    fetchData();
-  }, [selectedCategory]);
+  const filteredPost = await getFilteredPosts(
+    option,
+    category,
+    condition,
+    lowestPrice,
+    highestPrice
+  );
 
   return (
     <div className="flex max-w-7xl mx-auto px-4">
       <aside className="w-1/6 my-20 mr-5">
-        <Filter onCategoryChange={setSelectedCategory} />
+        <Filter />
       </aside>
       <main className="flex-grow">
         <header className="flex my-4">
@@ -102,7 +156,7 @@ export default async function MarketPage() {
           <CreatePost />
         </header>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {selectedPost.map((post) => (
+          {filteredPost.map((post) => (
             <PostCard key={post._id} post={Object.freeze(post)} />
           ))}
         </div>
