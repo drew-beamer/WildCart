@@ -34,8 +34,8 @@ export async function createOffer(
     return { error: { auth: "Unauthorized" }, success: false };
   }
   const user = session.user;
-
-  const validateField = createPostForm.safeParse({
+  
+  const validateField = createOfferForm.safeParse({
     name: formData.get("name"),
     description: formData.get("description"),
     picture: formData.get("picture"),
@@ -52,14 +52,16 @@ export async function createOffer(
       description: validateField.data.description,
       picture: Buffer.from(validateField.data.picture.split(",")[1], "base64"),
       condition: validateField.data.condition,
-      seller_id: new mongoose.Types.ObjectId(user.id),
+      post_id: new mongoose.Types.ObjectId(formData.get("post_id") as string),
+      seller_id: new mongoose.Types.ObjectId(formData.get("seller_id") as string),
+      buyer_id: new mongoose.Types.ObjectId(user.id),
       status: "Active",
     });
   } catch (error) {
-    console.error("Failed to create post", error);
+    console.error("Failed to create offer", error);
     return {
       error: {
-        server: "Validation succeeded but failed to create post",
+        server: "Validation succeeded but failed to create offer",
       },
       success: false,
     };
@@ -70,7 +72,7 @@ export async function createOffer(
 }
 
 // Zod validation schema for creating a post
-const createPostForm = z.object({
+const createOfferForm = z.object({
   // name is string, 4 chars min, does not contain banned words
   name: z
     .string()

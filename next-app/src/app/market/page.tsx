@@ -41,7 +41,7 @@ const getPost: PipelineStage[] = [
     },
   },
   {
-    $unset: ["seller_id", "__v", "seller"],
+    $unset: ["__v", "seller"],
   },
 ];
 
@@ -55,6 +55,7 @@ export interface PostDisplay {
   picture: Buffer;
   condition: string;
   seller_name: string;
+  seller_id: string;
 }
 
 const getFilteredPosts = async (
@@ -136,6 +137,7 @@ export default async function MarketPage({
   const condition = searchParams?.condition || "";
   const lowestPrice = parseInt(searchParams?.lowestPrice || "0", 10);
   const highestPrice = parseInt(searchParams?.highestPrice || "100", 10);
+
 
   const filteredPost = await getFilteredPosts(
     option,
