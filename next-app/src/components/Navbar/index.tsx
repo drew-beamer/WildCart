@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import Sidebar from "./Sidebar";
 import { UserNav } from "./Usernav";
 import { PackageIcon, SearchIcon, ShoppingCartIcon } from "lucide-react";
-import { GoogleSignInButton} from "./googlebutton";
+import { GoogleSignInButton} from "./GoogleButton";
 
 function Component() {
   return (
@@ -21,7 +21,6 @@ function Component() {
           </Link>
         </div>
         <UserNav />
-        <GoogleSignInButton/>
       </nav>
 
       {/* Desktop Navbar */}
@@ -57,7 +56,6 @@ function Component() {
           <div className="flex items-center gap-2">
             <UserNav />
           </div>
-          <GoogleSignInButton/>
         </div>
       </div>
     </>
