@@ -23,12 +23,16 @@ To install mongodb-community, follow the instructions for your operating system 
 
 We recommend using MongoDB Compass to interact with the database. It can be downloaded from the [MongoDB website](https://www.mongodb.com/products/tools/compass) as well.
 
-Once these prerequisites are installed, open Compass and connect to your local database. Create a new database called `wildcart`, and a collection called `posts`. This collection is where posts will be stored, further collections will be
-created via mongoose (one is required for the database to exist).
+Once these prerequisites are installed, open Compass and connect to your local database. Create a new database called `wildcart`, and a collection called `posts`. This collection is where posts will be stored, further collections will be created via mongoose (one is required for the database to exist).
 
 Now, create a file called `.env.local` in the root directory of the project. This file currently contains the following variables:
 
 - `MONGODB_URI`: The URI for the MongoDB database. This should be `mongodb://localhost:27017/wildcart` if you are using a local database, and followed the instructions above.
+- `AUTH_SECRET`: A secret key used to sign JWT tokens. This can be any string.
+
+Do the same for `.env.test`
+
+After setting up the mongo environment, create a .txt file called `bad-words.txt` in the root directory of the project. This file will include the banned words for the post filting functionality.
 
 #### Running the Server
 
