@@ -9,7 +9,7 @@ import {
 import { Post } from "@/models/Post";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { PostDisplay } from "@/app/market/page";
+import { PostDisplay } from "../../app/market/page";
 /**
  * Responsible for rendering a user display, showing the user's avatar and name.
  *
