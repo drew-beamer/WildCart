@@ -2,7 +2,7 @@ import PostCard from "@/components/PostCard";
 import dbConnect from "@/lib/dbConnect";
 import Post from "@/models/Post";
 import CreatePost from "./CreatePost";
-import { PipelineStage, set } from "mongoose";
+import { PipelineStage } from "mongoose";
 import Filter from "@/components/Filter";
 
 const getPost: PipelineStage[] = [
@@ -137,7 +137,6 @@ export default async function MarketPage({
   const condition = searchParams?.condition || "";
   const lowestPrice = parseInt(searchParams?.lowestPrice || "0", 10);
   const highestPrice = parseInt(searchParams?.highestPrice || "100", 10);
-
 
   const filteredPost = await getFilteredPosts(
     option,
