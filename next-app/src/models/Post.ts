@@ -7,7 +7,7 @@ export interface Post extends mongoose.Document {
   price: number;
   trade_mode: "Sell" | "Trade";
   picture: Buffer;
-  seller_id: mongoose.Types.ObjectId;
+  seller_id: string;
   status: "Active" | "Closed" | "Removed";
   condition: "Used" | "New";
 }
@@ -19,7 +19,7 @@ const PostSchema = new mongoose.Schema({
   price: { type: Number, required: true },
   trade_mode: { type: String, required: true },
   picture: { type: Buffer, required: true },
-  seller_id: { type: mongoose.Types.ObjectId, required: true, ref: "User" },
+  seller_id: { type: String, required: true, ref: "User" },
   status: { type: String, required: true },
   condition: { type: String, required: true },
 });

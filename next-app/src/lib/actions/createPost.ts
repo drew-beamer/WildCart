@@ -61,7 +61,7 @@ export async function createPost(
       trade_mode: validateField.data.trade_mode,
       picture: Buffer.from(validateField.data.picture.split(",")[1], "base64"),
       condition: validateField.data.condition,
-      seller_id: new mongoose.Types.ObjectId(user.id),
+      seller_id: user.id,
       status: "Active",
     });
   } catch (error) {
