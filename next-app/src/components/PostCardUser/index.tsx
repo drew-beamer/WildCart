@@ -8,8 +8,8 @@ import {
 } from "@/components/ui/card";
 import Image from "next/image";
 import { PostDisplay } from "@/app/market/page";
-import ViewDetails from "@/app/market/ViewDetails";
-import ViewOffer from "@/app/market/ViewOffer";
+import ViewDetails from "@/app/profile/ViewDetails";
+import ViewOffer from "@/app/profile/ViewOffer";
 /**
  * Responsible for rendering a user display, showing the user's avatar and name.
  *

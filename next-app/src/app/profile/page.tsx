@@ -15,6 +15,8 @@ import {
 } from "@/components/ui/card";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import acceptOffer from "@/lib/actions/acceptOffer";
+import AcceptOfferButton from "./AcceptButton";
 
 export default async function ProfilePage() {
   const session = await auth();
@@ -66,7 +68,10 @@ export default async function ProfilePage() {
                   </CardHeader>
                   <CardContent className="grow p-6"></CardContent>
                   <CardFooter className="w-full grid sm:grid-cols-2 gap-2">
-                    <Button variant="default">Accept</Button>
+                    <AcceptOfferButton
+                      offer_id={offer._id.toString()}
+                      email={offer.buyer_id.email}
+                    />
                     <Button variant="destructive">Decline</Button>
                   </CardFooter>
                 </Card>

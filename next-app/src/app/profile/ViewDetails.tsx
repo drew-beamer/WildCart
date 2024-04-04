@@ -7,7 +7,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { PostDisplay } from "./page";
+import { PostDisplay } from "../market/page";
 import { UserDisplay } from "@/components/PostCard";
 import Image from "next/image";
 
