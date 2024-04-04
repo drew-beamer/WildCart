@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth";
 import dbConnect from "@/lib/dbConnect";
 import Offer from "@/models/Offer";
-import mongoose from "mongoose";
+import mongoose, { PipelineStage } from "mongoose";
 import Post from "@/models/Post";
 import { redirect } from "next/navigation";
 import User from "@/models/User";
@@ -17,6 +17,8 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import acceptOffer from "@/lib/actions/acceptOffer";
 import AcceptOfferButton from "./AcceptButton";
+import { PostDisplay } from "@/app/market/page";
+import PostCardUser from "@/components/PostCardUser";
 
 export default async function ProfilePage() {
   const session = await auth();
@@ -36,6 +38,46 @@ export default async function ProfilePage() {
     .populate("buyer_id", "_id name email", User)
     .populate("post_id", "name", Post);
 
+  const getPost: PipelineStage[] = [
+    {
+      $lookup: {
+        from: "users",
+        let: {
+          seller_id: "$seller_id",
+        },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $eq: ["$$seller_id", "$_id"],
+              },
+            },
+          },
+          {
+            $project: {
+              name: 1,
+            },
+          },
+        ],
+        as: "seller",
+      },
+    },
+    {
+      $unwind: {
+        path: "$seller",
+        preserveNullAndEmptyArrays: false,
+      },
+    },
+    {
+      $addFields: {
+        seller_name: "$seller.name",
+      },
+    },
+    {
+      $unset: ["__v", "seller"],
+    },
+  ];
+  const userPosts = await Post.aggregate<PostDisplay>(getPost);
   return (
     <main className="max-w-3xl mx-auto mt-4 space-y-4 px-4">
       <header>
@@ -44,7 +86,7 @@ export default async function ProfilePage() {
       </header>
       <section>
         <h2 className="typography">Offers to Review</h2>
-        <ul className="flex space-x-2 overflow-x-scroll">
+        <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 overflow-x-scroll">
           {offersToReview.map((offer) => {
             const dataURL = `data:image/jpeg;base64,${offer.picture.toString(
               "base64"
@@ -82,6 +124,11 @@ export default async function ProfilePage() {
       </section>
       <section>
         <h2 className="typography">Your Posts</h2>
+        <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 overflow-x-scroll">
+          {userPosts.map((post) => (
+            <PostCardUser key={post._id} post={Object.freeze(post)} />
+          ))}
+        </ul>
       </section>
     </main>
   );
