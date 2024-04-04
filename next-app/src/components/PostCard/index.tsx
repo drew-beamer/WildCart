@@ -6,11 +6,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Post } from "@/models/Post";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { PostDisplay } from "@/app/market/page";
 import CreateOffer from "@/app/market/CreateOffer";
+import ViewDetails from "@/app/market/ViewDetails";
 /**
  * Responsible for rendering a user display, showing the user's avatar and name.
  *
@@ -18,7 +18,7 @@ import CreateOffer from "@/app/market/CreateOffer";
  *
  * @returns a user display, for use in the post card
  */
-function UserDisplay({ sellerName }: { sellerName: string }) {
+export function UserDisplay({ sellerName }: { sellerName: string }) {
   return (
     <div className="flex items-center space-x-2 leading-tight">
       <Avatar>
@@ -68,10 +68,11 @@ export default function PostCard({ post }: Readonly<{ post: PostDisplay }>) {
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 gap-2 mt-4">
-          <CreateOffer postId={post._id.toString()} sellerId={post.seller_id.toString()} />
-          <Button role="button" variant="outline">
-            Details
-          </Button>
+          <CreateOffer
+            postId={post._id.toString()}
+            sellerId={post.seller_id.toString()}
+          />
+          <ViewDetails post={post} />
         </div>
       </CardContent>
     </Card>
