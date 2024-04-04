@@ -34,7 +34,7 @@ export async function createOffer(
     return { error: { auth: "Unauthorized" }, success: false };
   }
   const user = session.user;
-  
+
   const validateField = createOfferForm.safeParse({
     name: formData.get("name"),
     description: formData.get("description"),
@@ -53,8 +53,8 @@ export async function createOffer(
       picture: Buffer.from(validateField.data.picture.split(",")[1], "base64"),
       condition: validateField.data.condition,
       post_id: new mongoose.Types.ObjectId(formData.get("post_id") as string),
-      seller_id: new mongoose.Types.ObjectId(formData.get("seller_id") as string),
-      buyer_id: new mongoose.Types.ObjectId(user.id),
+      seller_id: formData.get("seller_id"),
+      buyer_id: user.id,
       status: "Active",
     });
   } catch (error) {
