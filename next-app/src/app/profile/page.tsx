@@ -1,18 +1,10 @@
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { auth } from "@/lib/auth";
-import { redirect } from "next/navigation";
-import Offer from "@/models/Offer";
 import dbConnect from "@/lib/dbConnect";
-import User from "@/models/User";
+import Offer from "@/models/Offer";
+import mongoose, { PipelineStage } from "mongoose";
 import Post from "@/models/Post";
+import { redirect } from "next/navigation";
+import User from "@/models/User";
 import {
   Card,
   CardContent,
@@ -22,9 +14,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import acceptOffer from "@/lib/actions/acceptOffer";
 import AcceptOfferButton from "./AcceptButton";
+import { PostDisplay } from "@/app/market/page";
+import PostCardUser from "@/components/PostCardUser";
 
-export default async function ViewOffer() {
+export default async function ProfilePage() {
   const session = await auth();
 
   if (!session || !session.user) {
@@ -34,6 +30,7 @@ export default async function ViewOffer() {
   await dbConnect();
 
   const { user } = session;
+
   const offersToReview = await Offer.find({
     seller_id: user.id,
     status: "Active",
@@ -41,24 +38,62 @@ export default async function ViewOffer() {
     .populate("buyer_id", "_id name email", User)
     .populate("post_id", "name", Post);
 
+  const getPost: PipelineStage[] = [
+    {
+      $lookup: {
+        from: "users",
+        let: {
+          seller_id: "$seller_id",
+        },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $eq: ["$$seller_id", "$_id"],
+              },
+            },
+          },
+          {
+            $project: {
+              name: 1,
+            },
+          },
+        ],
+        as: "seller",
+      },
+    },
+    {
+      $unwind: {
+        path: "$seller",
+        preserveNullAndEmptyArrays: false,
+      },
+    },
+    {
+      $addFields: {
+        seller_name: "$seller.name",
+      },
+    },
+    {
+      $unset: ["__v", "seller"],
+    },
+  ];
+  const userPosts = await Post.aggregate<PostDisplay>(getPost);
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button>View Offers</Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Offers</DialogTitle>
-        </DialogHeader>
+    <main className="max-w-3xl mx-auto mt-4 space-y-4 px-4">
+      <header>
+        <h1 className="typography">Profile</h1>
+        <p className="lead">Welcome back, {user.name}</p>
+      </header>
+      <section>
         <h2 className="typography">Offers to Review</h2>
-        <ul className="overflow-x-scroll">
+        <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 overflow-x-scroll">
           {offersToReview.map((offer) => {
             const dataURL = `data:image/jpeg;base64,${offer.picture.toString(
               "base64"
             )}`;
             return (
               <li className="flex my-2" key={offer._id}>
-                <Card className="flex flex-col w-full">
+                <Card className="flex flex-col w-64">
                   <CardHeader className="w-full p-0">
                     <div className="w-full relative h-32">
                       <Image
@@ -69,7 +104,7 @@ export default async function ViewOffer() {
                       />
                     </div>
                     <CardTitle className="px-6">{offer.name}</CardTitle>
-                    <CardDescription className="px-6 break-words line-clamp-3">
+                    <CardDescription className="px-6 break-words">
                       {offer.description}
                     </CardDescription>
                   </CardHeader>
@@ -86,7 +121,15 @@ export default async function ViewOffer() {
             );
           })}
         </ul>
-      </DialogContent>
-    </Dialog>
+      </section>
+      <section>
+        <h2 className="typography">Your Posts</h2>
+        <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 overflow-x-scroll">
+          {userPosts.map((post) => (
+            <PostCardUser key={post._id} post={Object.freeze(post)} />
+          ))}
+        </ul>
+      </section>
+    </main>
   );
 }
