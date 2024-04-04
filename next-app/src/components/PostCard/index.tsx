@@ -7,10 +7,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
 import { PostDisplay } from "@/app/market/page";
 import CreateOffer from "@/app/market/CreateOffer";
-import ViewDetails from "@/app/market/ViewDetails";
+import ViewDetails from "@/app/profile/ViewDetails";
 /**
  * Responsible for rendering a user display, showing the user's avatar and name.
  *
