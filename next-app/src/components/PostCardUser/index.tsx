@@ -7,10 +7,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
 import { PostDisplay } from "@/app/market/page";
-import CreateOffer from "@/app/market/CreateOffer";
 import ViewDetails from "@/app/market/ViewDetails";
+import ViewOffer from "@/app/market/ViewOffer";
 /**
  * Responsible for rendering a user display, showing the user's avatar and name.
  *
@@ -44,7 +43,9 @@ export function UserDisplay({ sellerName }: { sellerName: string }) {
  *
  * @returns a card that represents a post, for use in the market page
  */
-export default function PostCard({ post }: Readonly<{ post: PostDisplay }>) {
+export default function PostCardUser({
+  post,
+}: Readonly<{ post: PostDisplay }>) {
   const imageUrl = `data:image/jpeg;base64,${post.picture.toString("base64")}`;
 
   return (
@@ -68,10 +69,7 @@ export default function PostCard({ post }: Readonly<{ post: PostDisplay }>) {
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 gap-2 mt-4">
-          <CreateOffer
-            postId={post._id.toString()}
-            sellerId={post.seller_id.toString()}
-          />
+          <ViewOffer />
           <ViewDetails post={post} />
         </div>
       </CardContent>
