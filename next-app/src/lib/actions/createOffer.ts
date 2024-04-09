@@ -1,6 +1,6 @@
 "use server";
 
-import Post from "@/models/Post";
+import Offer from "@/models/Offer";
 import mongoose from "mongoose";
 import { auth } from "@/lib/auth";
 import { z } from "zod";
@@ -12,9 +12,6 @@ export interface FormState {
   error?: {
     name?: string[] | undefined;
     description?: string[] | undefined;
-    category?: string[] | undefined;
-    price?: string[] | undefined;
-    trade_mode?: string[] | undefined;
     picture?: string[] | undefined;
     condition?: string[] | undefined;
     server?: string | undefined;
@@ -28,7 +25,7 @@ export interface FormState {
  * @param formData - current form data
  * @returns
  */
-export async function createPost(
+export async function createOffer(
   prevState: any,
   formData: FormData
 ): Promise<FormState> {
@@ -38,12 +35,9 @@ export async function createPost(
   }
   const user = session.user;
 
-  const validateField = createPostForm.safeParse({
+  const validateField = createOfferForm.safeParse({
     name: formData.get("name"),
     description: formData.get("description"),
-    category: formData.get("category"),
-    price: formData.get("price"),
-    trade_mode: formData.get("trade_mode"),
     picture: formData.get("picture"),
     condition: formData.get("condition"),
   });
@@ -53,22 +47,21 @@ export async function createPost(
   }
 
   try {
-    await Post.create({
+    await Offer.create({
       name: validateField.data.name,
       description: validateField.data.description,
-      category: validateField.data.category,
-      price: validateField.data.price,
-      trade_mode: validateField.data.trade_mode,
       picture: Buffer.from(validateField.data.picture.split(",")[1], "base64"),
       condition: validateField.data.condition,
-      seller_id: user.id,
+      post_id: new mongoose.Types.ObjectId(formData.get("post_id") as string),
+      seller_id: formData.get("seller_id"),
+      buyer_id: user.id,
       status: "Active",
     });
   } catch (error) {
-    console.error("Failed to create post", error);
+    console.error("Failed to create offer", error);
     return {
       error: {
-        server: "Validation succeeded but failed to create post",
+        server: "Validation succeeded but failed to create offer",
       },
       success: false,
     };
@@ -79,7 +72,7 @@ export async function createPost(
 }
 
 // Zod validation schema for creating a post
-const createPostForm = z.object({
+const createOfferForm = z.object({
   // name is string, 4 chars min, does not contain banned words
   name: z
     .string()
@@ -95,12 +88,6 @@ const createPostForm = z.object({
     .refine((val) => !containsBannedWords(val), {
       message: "Description contains banned words",
     }),
-  // category is string
-  category: z.string(),
-  // price is number, min 0
-  price: z.coerce.number().min(0),
-  // trade_mode is string, must be either "Sell" or "Trade"
-  trade_mode: z.string().refine((val) => ["Sell", "Trade"].includes(val)),
   // picture is string, must be a jpeg base64 image
   picture: z.string().startsWith("data:image/jpeg;base64"),
   // condition is string, must be either "Used" or "New"

@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { cn } from "@/lib/utils";
-import Navbar from '@/components/Navbar'; 
 import "./globals.css";
+import Navbar from "@/components/Navbar";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
   title: "Wildcart",
-  description: "Something here...",
+  description: "A Davidson project",
 };
 
 export default function RootLayout({
@@ -22,8 +22,9 @@ export default function RootLayout({
         className={cn(
           "min-h-screen bg-background font-sans antialiased",
           inter.variable
-        )}>
-        <Navbar/>
+        )}
+      >
+        <Navbar />
         {children}
       </body>
     </html>

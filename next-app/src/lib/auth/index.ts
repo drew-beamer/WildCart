@@ -1,13 +1,11 @@
 import NextAuth, { NextAuthConfig } from "next-auth";
-import Credentials from "next-auth/providers/credentials";
-import { z } from "zod";
-import bcrypt from "bcrypt";
-import UserSchema, { User } from "@/models/User";
+import GoogleProvider from "next-auth/providers/google";
 import dbConnect from "../dbConnect";
+import UserSchema, { User } from "@/models/User";
 
-async function getUser(email: string): Promise<User | null> {
+async function getUser(id: string): Promise<User | null> {
   await dbConnect();
-  const user = await UserSchema.findOne({ email });
+  const user = await UserSchema.findById(id);
   if (!user) {
     return null;
   }
@@ -21,49 +19,60 @@ export const {
   signOut,
 } = NextAuth({
   callbacks: {
+    async jwt({ token, profile, account }) {
+      if (profile) {
+        token.sub = profile.sub as string;
+      }
+      return token;
+    },
     async session({ session, token }) {
       if (token.sub) {
         session.user.id = token.sub;
       }
       return session;
     },
+    async signIn({ account, profile }) {
+      if (account && profile) {
+        if (account.provider === "google") {
+          if (
+            profile.email_verified &&
+            profile.email?.endsWith("@davidson.edu")
+          ) {
+            const userId = profile.sub as string;
+            await dbConnect();
+            const user = await getUser(userId);
+            if (!user) {
+              await new UserSchema({
+                _id: userId,
+                name: profile.name as string,
+                email: profile.email as string,
+                buy_list: [],
+                sell_list: [],
+              }).save();
+            } else {
+              // Update user's name and email if they have changed
+              if (user.name !== profile.name) {
+                user.name = profile.name as string;
+                await user.save();
+              }
+              if (user.email !== profile.email) {
+                user.email = profile.email as string;
+                await user.save();
+              }
+            }
+            return true;
+          }
+        } else {
+          return true;
+        }
+      }
+      return false;
+    },
   },
   providers: [
-    Credentials({
-      name: "credentials",
-      async authorize(credentials) {
-        const parsedCredentials = z
-          .object({
-            email: z.string().email().endsWith("@davidson.edu"),
-            password: z.string().min(6),
-          })
-          .safeParse(credentials);
-
-        if (!parsedCredentials.success) {
-          return null;
-        }
-
-        const parsedData = parsedCredentials.data;
-
-        const user = await getUser(parsedData.email);
-        if (!user) {
-          return null;
-        }
-        const isValid = await bcrypt.compare(
-          parsedData.password,
-          user.password
-        );
-
-        if (!isValid) {
-          return null;
-        }
-
-        return {
-          id: user._id.toString(),
-          email: user.email,
-          name: user.name,
-        };
-      },
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID as string,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
     }),
   ],
 } satisfies NextAuthConfig);

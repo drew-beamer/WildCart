@@ -2,7 +2,7 @@ import PostCard from "@/components/PostCard";
 import dbConnect from "@/lib/dbConnect";
 import Post from "@/models/Post";
 import CreatePost from "./CreatePost";
-import { PipelineStage, set } from "mongoose";
+import { PipelineStage } from "mongoose";
 import Filter from "@/components/Filter";
 
 const getPost: PipelineStage[] = [
@@ -41,7 +41,7 @@ const getPost: PipelineStage[] = [
     },
   },
   {
-    $unset: ["seller_id", "__v", "seller"],
+    $unset: ["__v", "seller"],
   },
 ];
 
@@ -55,6 +55,7 @@ export interface PostDisplay {
   picture: Buffer;
   condition: string;
   seller_name: string;
+  seller_id: string;
 }
 
 const getFilteredPosts = async (
