@@ -16,10 +16,12 @@ import { useFormState } from "react-dom";
 export default function AcceptOfferButton({
   offer_id,
   post_id,
+  type,
   email,
 }: {
   offer_id: string;
   post_id: string;
+  type: string;
   email: string;
 }) {
   const [prevState, formAction] = useFormState(acceptOffer, { success: false });
@@ -47,6 +49,7 @@ export default function AcceptOfferButton({
             const formData = new FormData();
             formData.append("offer_id", offer_id.toString());
             formData.append("post_id", post_id.toString());
+            formData.append("type", type.toString());
             formAction(formData);
           }}
         >

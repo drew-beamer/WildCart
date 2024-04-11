@@ -6,6 +6,7 @@ import Offer from "@/models/Offer";
 import User from "@/models/User";
 import { revalidatePath } from "next/cache";
 import Post from "@/models/Post";
+import OfferSell from "@/models/OfferSell";
 
 export default async function acceptOffer(prevState: any, formData: FormData) {
   await dbConnect();
@@ -19,9 +20,21 @@ export default async function acceptOffer(prevState: any, formData: FormData) {
   if (!formData.has("post_id")) {
     return { error: { post_id: "Post ID is required" }, success: false };
   }
-  console.log(formData.get("offer_id"));
-  const offer = await Offer.findById(formData.get("offer_id"));
-  console.log(formData.get("post_id"));
+  if (!formData.has("type")) {
+    return { error: { type: "Type is required" }, success: false };
+  }
+
+  const type = formData.get("type");
+
+  let offer;
+  let offerPromise;
+  let rejectedOffersPromise;
+
+  if (type == "Sell") {
+    offer = await OfferSell.findById(formData.get("offer_id"));
+  } else if (type == "Trade") {
+    offer = await Offer.findById(formData.get("offer_id"));
+  }
   const post = await Post.findById(formData.get("post_id"));
 
   if (!offer) {
@@ -35,18 +48,37 @@ export default async function acceptOffer(prevState: any, formData: FormData) {
   const seller = await User.findById(offer.seller_id);
   const buyer = await User.findById(offer.buyer_id);
 
-  const offerPromise = Offer.updateOne(
-    { _id: offer._id },
-    { status: "Accepted" }
-  );
+  if (type == "Sell") {
+    offerPromise = OfferSell.updateOne(
+      { _id: offer._id },
+      { status: "Accepted" }
+    );
+  } else if (type == "Trade") {
+    offerPromise = Offer.updateOne({ _id: offer._id }, { status: "Accepted" });
+  }
 
   const postPromise = Post.updateOne({ _id: post._id }, { status: "Closed" });
 
-  const rejectedOffersPromise = Offer.updateMany(
-    { post_id: offer.post_id, _id: { $ne: offer._id } },
-    { status: "Rejected" }
-  );
+  if (type == "Sell") {
+    offerPromise = OfferSell.updateOne(
+      { _id: offer._id },
+      { status: "Accepted" }
+    );
+  } else if (type == "Trade") {
+    offerPromise = Offer.updateOne({ _id: offer._id }, { status: "Accepted" });
+  }
 
+  if (type == "Sell") {
+    rejectedOffersPromise = OfferSell.updateMany(
+      { post_id: offer.post_id, _id: { $ne: offer._id } },
+      { status: "Rejected" }
+    );
+  } else if (type == "Trade") {
+    rejectedOffersPromise = Offer.updateMany(
+      { post_id: offer.post_id, _id: { $ne: offer._id } },
+      { status: "Rejected" }
+    );
+  }
   const sellerPromise = User.updateOne(
     { _id: seller._id },
     { $push: { sell_list: offer.post_id } }

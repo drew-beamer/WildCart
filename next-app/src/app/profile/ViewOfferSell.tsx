@@ -68,7 +68,8 @@ export default async function ViewOfferSell({
                   <CardFooter className="w-full grid sm:grid-cols-2 gap-2">
                     <AcceptOfferButton
                       offer_id={offer._id.toString()}
-                      post_id={offer.post_id._id.toString()}
+                      post_id={post._id.toString()}
+                      type={post.trade_mode}
                       email={offer.buyer_id.email}
                     />
                     <Button variant="destructive">Decline</Button>
