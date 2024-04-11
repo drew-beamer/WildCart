@@ -19,4 +19,4 @@ const OfferSellSchema = new mongoose.Schema({
 });
 
 export default mongoose.models.OfferSell ||
-  mongoose.model<OfferSell>("offer_sells", OfferSellSchema);
+  mongoose.model<OfferSell>("OfferSell", OfferSellSchema);

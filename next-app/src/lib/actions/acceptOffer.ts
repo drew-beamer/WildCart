@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 import Offer from "@/models/Offer";
 import User from "@/models/User";
 import { revalidatePath } from "next/cache";
+import Post from "@/models/Post";
 
 export default async function acceptOffer(prevState: any, formData: FormData) {
   await dbConnect();
@@ -15,10 +16,20 @@ export default async function acceptOffer(prevState: any, formData: FormData) {
     return { error: { offer_id: "Offer ID is required" }, success: false };
   }
 
+  if (!formData.has("post_id")) {
+    return { error: { post_id: "Post ID is required" }, success: false };
+  }
+  console.log(formData.get("offer_id"));
   const offer = await Offer.findById(formData.get("offer_id"));
+  console.log(formData.get("post_id"));
+  const post = await Post.findById(formData.get("post_id"));
 
   if (!offer) {
     return { error: { offer_id: "Offer not found" }, success: false };
+  }
+
+  if (!post) {
+    return { error: { post_id: "Post not found" }, success: false };
   }
 
   const seller = await User.findById(offer.seller_id);
@@ -28,6 +39,8 @@ export default async function acceptOffer(prevState: any, formData: FormData) {
     { _id: offer._id },
     { status: "Accepted" }
   );
+
+  const postPromise = Post.updateOne({ _id: post._id }, { status: "Closed" });
 
   const rejectedOffersPromise = Offer.updateMany(
     { post_id: offer.post_id, _id: { $ne: offer._id } },
@@ -46,6 +59,7 @@ export default async function acceptOffer(prevState: any, formData: FormData) {
 
   const result = await Promise.all([
     offerPromise,
+    postPromise,
     sellerPromise,
     buyerPromise,
     rejectedOffersPromise,

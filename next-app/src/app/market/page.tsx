@@ -43,6 +43,11 @@ const getPost: PipelineStage[] = [
   {
     $unset: ["__v", "seller"],
   },
+  {
+    $match: {
+      status: "Active",
+    },
+  },
 ];
 
 export interface PostDisplay {
