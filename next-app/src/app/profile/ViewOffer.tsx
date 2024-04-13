@@ -49,19 +49,16 @@ export default async function ViewOffer({
       <DialogTrigger asChild>
         <Button>View Offers</Button>
       </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Offers</DialogTitle>
-        </DialogHeader>
+      <DialogContent className="overflow-scroll max-h-screen p-8 max-w-4xl">
         <h2 className="typography">Offers to Review</h2>
-        <ul className="overflow-x-scroll">
+        <ul className="overflow-x-scroll flex flex-wrap justify-start">
           {offersToReview.map((offer) => {
             const dataURL = `data:image/jpeg;base64,${offer.picture.toString(
               "base64"
             )}`;
             return (
-              <li className="flex my-2" key={offer._id}>
-                <Card className="flex flex-col w-full">
+              <li className="flex my-2 px-2 md:w-1/3" key={offer._id}>
+                <Card className="flex flex-col w-64 my-2">
                   <CardHeader className="w-full p-0">
                     <div className="w-full relative h-32">
                       <Image
@@ -77,14 +74,16 @@ export default async function ViewOffer({
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="grow p-6"></CardContent>
-                  <CardFooter className="w-full grid sm:grid-cols-2 gap-2">
+                  <CardFooter className="w-full grid grid-cols-2 gap-2">
                     <AcceptOfferButton
                       offer_id={offer._id.toString()}
                       post_id={post._id.toString()}
                       type={post.trade_mode}
                       email={offer.buyer_id.email}
                     />
-                    <Button variant="destructive">Decline</Button>
+                    <Button variant="destructive" className="w-full">
+                      Decline
+                    </Button>
                   </CardFooter>
                 </Card>
               </li>

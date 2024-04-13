@@ -53,7 +53,9 @@ export default function AcceptOfferButton({
             formAction(formData);
           }}
         >
-          <Button type="submit">Accept Offer</Button>
+          <Button className="w-full" type="submit">
+            Accept Offer
+          </Button>
         </form>
       </DialogTrigger>
       <DialogContent>
