@@ -10,6 +10,7 @@ import Image from "next/image";
 import { PostDisplay } from "@/app/market/page";
 import CreateOffer from "@/app/market/CreateOffer";
 import ViewDetails from "@/app/profile/ViewDetails";
+import CreateOfferSell from "@/app/market/CreateOfferSell";
 /**
  * Responsible for rendering a user display, showing the user's avatar and name.
  *
@@ -66,13 +67,28 @@ export default function PostCard({ post }: Readonly<{ post: PostDisplay }>) {
         </div>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2 gap-2 mt-4">
-          <CreateOffer
-            postId={post._id.toString()}
-            sellerId={post.seller_id.toString()}
-          />
-          <ViewDetails post={post} />
-        </div>
+        <>
+          {post.trade_mode === "Trade" && (
+            <div className="grid grid-cols-2 gap-2 mt-4">
+              <CreateOffer
+                postId={post._id.toString()}
+                sellerId={post.seller_id.toString()}
+              />
+              <ViewDetails post={post} />
+            </div>
+          )}
+        </>
+        <>
+          {post.trade_mode === "Sell" && (
+            <div className="grid grid-cols-2 gap-2 mt-4">
+              <CreateOfferSell
+                postId={post._id.toString()}
+                sellerId={post.seller_id.toString()}
+              />
+              <ViewDetails post={post} />
+            </div>
+          )}
+        </>
       </CardContent>
     </Card>
   );

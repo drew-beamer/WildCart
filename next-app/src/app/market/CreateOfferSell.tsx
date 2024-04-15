@@ -10,15 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { FormState, createOffer } from "@/lib/actions/createOffer";
+import { FormState, createOfferSell } from "@/lib/actions/createOfferSell";
 import { compressImage } from "@/lib/image-utils";
 import { useFormState, useFormStatus } from "react-dom";
 import { useEffect, useState } from "react";
@@ -29,14 +21,16 @@ import { cn } from "@/lib/utils";
  * Renders the form for creating a post, and handles the form submission
  * @returns the form for creating a post
  */
-export default function CreateOffer({
+export default function CreateOfferSell({
   postId,
   sellerId,
 }: {
   postId: string;
   sellerId: string;
 }) {
-  const [formState, submitForm] = useFormState(createOffer, { success: false });
+  const [formState, submitForm] = useFormState(createOfferSell, {
+    success: false,
+  });
   const [dialogOpen, setDialogOpen] = useState(false);
   const [loadState, setLoadState] = useState(0);
 
@@ -81,7 +75,7 @@ export default function CreateOffer({
       </DialogTrigger>
       <DialogContent className="overflow-scroll max-h-screen p-4">
         <DialogHeader>
-          <DialogTitle>Submit a trade offer</DialogTitle>
+          <DialogTitle>Submit a buy offer</DialogTitle>
         </DialogHeader>
         <form
           action={async (formData: FormData) => {
@@ -121,30 +115,15 @@ function Form({
 
   return (
     <>
-      <h3 className="font-bold">Item Information</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <InputWithErrorState
-            label="Name*"
-            errors={formState.error?.name}
-            name="name"
-            type="text"
+            label="Approximate Value*"
+            errors={formState.error?.price}
+            name="price"
+            type="number"
             required
           />
-        </div>
-
-        <div>
-          <InputWithErrorState
-            label="Picture*"
-            errors={formState.error?.picture}
-            name="picture"
-            type="file"
-            accept="image/*"
-            required
-          />
-        </div>
-        <div>
-          <ConditionSelect errors={formState.error?.condition} />
         </div>
         <div>
           <DescriptionInput errors={formState.error?.description} />
@@ -161,36 +140,6 @@ function Form({
         </Button>
         <Progress value={loadProgress} />
       </div>
-    </>
-  );
-}
-
-/**
- * Renders the condition select dropdown
- *
- * @param errors - The errors for the condition select
- * @returns
- */
-function ConditionSelect({ errors }: { errors: string[] | undefined }) {
-  return (
-    <>
-      <Label htmlFor="condition">Condition*</Label>
-      <Select name="condition">
-        <SelectTrigger>
-          <SelectValue placeholder="Select a condition" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectGroup>
-            <SelectItem value="New">New</SelectItem>
-            <SelectItem value="Used">Used</SelectItem>
-          </SelectGroup>
-        </SelectContent>
-      </Select>
-      {errors?.map((error, index) => (
-        <p key={index} className="text-sm text-red-500">
-          {error}
-        </p>
-      ))}
     </>
   );
 }
