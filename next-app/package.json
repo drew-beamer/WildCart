@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "test": "jest",
-    "prepare": "cd .. && husky next-app/.husky"
+    "prepare": "cd .. && husky install next-app/.husky"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.0.4",

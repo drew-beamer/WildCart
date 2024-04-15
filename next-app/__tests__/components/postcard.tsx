@@ -11,6 +11,7 @@ const post: Readonly<PostDisplay> = Object.freeze({
   price: 95.99,
   trade_mode: "Trade",
   condition: "New",
+  seller_id: "1234567890",
   seller_name: "John Doe",
 });
 
