@@ -12,7 +12,7 @@ import acceptOffer from "@/lib/actions/acceptOffer";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useFormState } from "react-dom";
-
+// TODO: implement add score functionality
 export default function AcceptOfferButton({
   offer_id,
   post_id,
@@ -31,6 +31,7 @@ export default function AcceptOfferButton({
   useEffect(() => {
     if (prevState.success) {
       setOpen(true);
+      
     }
   }, [prevState]);
 

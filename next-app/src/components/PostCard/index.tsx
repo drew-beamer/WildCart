@@ -28,9 +28,10 @@ export function UserDisplay({ sellerName }: { sellerName: string }) {
             .reduce((initials, name) => initials + name[0], "")}
         </AvatarFallback>
       </Avatar>
+      {/* TODO: display data here */}
       <div>
         <p>{sellerName}</p>
-        <p className="text-xs">Level 40</p>
+        <p className="text-xs">40</p>
       </div>
     </div>
   );

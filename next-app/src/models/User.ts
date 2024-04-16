@@ -6,6 +6,8 @@ export interface User extends mongoose.Document {
   email: string;
   buy_list: [mongoose.Types.ObjectId];
   sell_list: [mongoose.Types.ObjectId];
+  score: number;
+  
 }
 
 const UserSchema = new mongoose.Schema({
@@ -14,6 +16,7 @@ const UserSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true, index: true },
   buy_list: { type: [mongoose.Types.ObjectId], required: true, ref: "Offer" },
   sell_list: { type: [mongoose.Types.ObjectId], required: true, ref: "Post" },
+  score: { type: Number, default: 0 }
 });
 
 export default mongoose.models.User || mongoose.model<User>("User", UserSchema);
