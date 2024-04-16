@@ -20,14 +20,13 @@ export default async function ProfilePage() {
 
   const { user } = session;
 
-  const offersToReview = await Offer.find({
-    seller_id: user.id,
-    status: "Active",
-  })
-    .populate("buyer_id", "_id name email", User)
-    .populate("post_id", "name", Post);
-
   const getActivePost: PipelineStage[] = [
+    {
+      $match: {
+        status: "Active",
+        seller_id: user.id,
+      },
+    },
     {
       $lookup: {
         from: "users",
@@ -64,16 +63,17 @@ export default async function ProfilePage() {
     },
     {
       $unset: ["__v", "seller"],
-    },
-    {
-      $match: {
-        status: "Active",
-      },
     },
   ];
 
   const getClosedPost: PipelineStage[] = [
     {
+      $match: {
+        status: "Closed",
+        seller_id: user.id,
+      },
+    },
+    {
       $lookup: {
         from: "users",
         let: {
@@ -109,11 +109,6 @@ export default async function ProfilePage() {
     },
     {
       $unset: ["__v", "seller"],
-    },
-    {
-      $match: {
-        status: "Closed",
-      },
     },
   ];
 
