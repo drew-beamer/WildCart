@@ -28,7 +28,7 @@ export function UserDisplay({ sellerName }: { sellerName: string }) {
       </Avatar>
       <div>
         <p>{sellerName}</p>
-        <p className="text-xs">Level 40</p>
+        
       </div>
     </div>
   );
