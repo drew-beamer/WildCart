@@ -31,7 +31,7 @@ import { revalidatePath } from "next/cache";
  *
  * @returns a user display, for use in the post card
  */
-export function UserDisplay({ sellerName }: { sellerName: string }) {
+export function UserDisplay({ sellerName, userScore }: { sellerName: string, userScore: number}) {
   return (
     <div className="flex items-center space-x-2 leading-tight">
       <Avatar>
@@ -43,7 +43,7 @@ export function UserDisplay({ sellerName }: { sellerName: string }) {
       </Avatar>
       <div>
         <p>{sellerName}</p>
-        <p className="text-xs">Level 40</p>
+        <p className="text-xs">Level {userScore}</p>
       </div>
     </div>
   );
@@ -57,9 +57,12 @@ export function UserDisplay({ sellerName }: { sellerName: string }) {
  *
  * @returns a card that represents a post, for use in the market page
  */
-export default function PostCardUser({
-  post,
-}: Readonly<{ post: PostDisplay }>) {
+
+interface PostCardUserProps {
+  post: Readonly<PostDisplay>;
+  score: number; 
+}
+export default function PostCardUser({ post, score }: PostCardUserProps) {
   const imageUrl = `data:image/jpeg;base64,${post.picture.toString("base64")}`;
 
   return (
@@ -97,7 +100,7 @@ export default function PostCardUser({
               </DialogContent>
             </Dialog>
           </CardTitle>
-          <UserDisplay sellerName={post.seller_name} />
+          <UserDisplay sellerName={post.seller_name} userScore={score}/>
           <CardDescription className="line-clamp-3">
             {post.description}
           </CardDescription>

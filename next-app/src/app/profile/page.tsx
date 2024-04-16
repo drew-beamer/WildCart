@@ -19,6 +19,9 @@ export default async function ProfilePage() {
   await dbConnect();
 
   const { user } = session;
+  const userId = user.id;
+  const userScoreDoc = await User.findOne({ _id: userId }).select("score");
+  const score = userScoreDoc ? userScoreDoc.score : 0;
 
   const getActivePost: PipelineStage[] = [
     {
@@ -118,13 +121,13 @@ export default async function ProfilePage() {
     <main className="max-w-3xl mx-auto mt-4 space-y-4 px-4">
       <header>
         <h1 className="typography">Profile</h1>
-        <p className="lead">Welcome back, {user.name}</p>
+        <p className="lead">Welcome back, {user.name} Level {getLevelFromScore(score)}, you have finished {score/10} orders</p>
       </header>
       <section>
         <h2 className="typography">Your Active Posts</h2>
         <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 overflow-x-scroll">
           {userActivePosts.map((post) => (
-            <PostCardUser key={post._id} post={Object.freeze(post)} />
+            <PostCardUser key={post._id} post={Object.freeze(post)} score={getLevelFromScore(score)} />
           ))}
         </ul>
       </section>
@@ -138,4 +141,13 @@ export default async function ProfilePage() {
       </section>
     </main>
   );
+}
+
+function getLevelFromScore(score: number) {
+  if (score < 10) return 1;
+  if (score < 30) return 2;
+  if (score < 80) return 3;
+  if (score < 160) return 4;
+  
+  return 5; 
 }

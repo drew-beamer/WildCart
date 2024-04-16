@@ -81,12 +81,13 @@ export default async function acceptOffer(prevState: any, formData: FormData) {
   }
   const sellerPromise = User.updateOne(
     { _id: seller._id },
-    { $push: { sell_list: offer.post_id } }
+    { $push: { sell_list: offer.post_id }, $inc: { score: 10 } }
+    
   );
 
   const buyerPromise = await User.updateOne(
     { _id: buyer._id },
-    { $push: { buy_list: offer.post_id } }
+    { $push: { buy_list: offer.post_id },$inc: { score: 10 } }
   );
 
   const result = await Promise.all([

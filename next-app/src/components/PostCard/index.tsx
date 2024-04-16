@@ -18,7 +18,7 @@ import CreateOfferSell from "@/app/market/CreateOfferSell";
  *
  * @returns a user display, for use in the post card
  */
-export function UserDisplay({ sellerName }: { sellerName: string }) {
+export function UserDisplay({ sellerName, userScore }: { sellerName: string, userScore: number }) {
   return (
     <div className="flex items-center space-x-2 leading-tight">
       <Avatar>
@@ -28,9 +28,11 @@ export function UserDisplay({ sellerName }: { sellerName: string }) {
             .reduce((initials, name) => initials + name[0], "")}
         </AvatarFallback>
       </Avatar>
+      {/* TODO: display data here */}
       <div>
         <p>{sellerName}</p>
-        <p className="text-xs">Level 40</p>
+        <p className="text-xs">Level {getLevelFromScore(userScore)}</p>
+        <p className="text-xs">{(userScore/10)} orders</p>
       </div>
     </div>
   );
@@ -44,8 +46,15 @@ export function UserDisplay({ sellerName }: { sellerName: string }) {
  *
  * @returns a card that represents a post, for use in the market page
  */
-export default function PostCard({ post }: Readonly<{ post: PostDisplay }>) {
+interface PostCardProps {
+  post: Readonly<PostDisplay>;
+  score: number; 
+}
+
+export default function PostCard({ post, score }: PostCardProps) {
+/*export default function PostCard({ post }: Readonly<{ post: PostDisplay }>, {score}: Readonly<{score: number}>) {*/
   const imageUrl = `data:image/jpeg;base64,${post.picture.toString("base64")}`;
+  
 
   return (
     <Card className="flex flex-col">
@@ -59,8 +68,8 @@ export default function PostCard({ post }: Readonly<{ post: PostDisplay }>) {
           />
         </div>
         <div className="px-4 pt-2 space-y-2">
-          <CardTitle>{post.name}</CardTitle>
-          <UserDisplay sellerName={post.seller_name} />
+          <CardTitle>{post.name}</CardTitle> 
+          <UserDisplay sellerName={post.seller_name} userScore={score} />
           <CardDescription className="line-clamp-3">
             {post.description}
           </CardDescription>
@@ -92,4 +101,13 @@ export default function PostCard({ post }: Readonly<{ post: PostDisplay }>) {
       </CardContent>
     </Card>
   );
+}
+
+function getLevelFromScore(userScore: number) {
+  if (userScore < 10) return 1;
+  if (userScore < 30) return 2;
+  if (userScore < 80) return 3;
+  if (userScore < 160) return 4;
+  
+  return 5; 
 }

@@ -4,6 +4,9 @@ import Post from "@/models/Post";
 import CreatePost from "./CreatePost";
 import { PipelineStage } from "mongoose";
 import Filter from "@/components/Filter";
+import { auth } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import User from "@/models/User";
 
 const getPost: PipelineStage[] = [
   {
@@ -61,6 +64,7 @@ export interface PostDisplay {
   condition: string;
   seller_name: string;
   seller_id: string;
+  
 }
 
 const getFilteredPosts = async (
@@ -136,7 +140,20 @@ export default async function MarketPage({
     highestPrice?: string;
   };
 }) {
+  const session = await auth();
+
+  if (!session || !session.user) {
+    redirect("/login");
+  }
   await dbConnect();
+  const { user } = session;
+  const userId = user.id;
+  // const score = await User.find({
+  //   _id : userId
+  // }).select("score");
+  const userScoreDoc = await User.findOne({ _id: userId }).select("score");
+  const score = userScoreDoc ? userScoreDoc.score : 0;
+
   const category = searchParams?.category || "";
   const option = searchParams?.option || "";
   const condition = searchParams?.condition || "";
@@ -163,7 +180,7 @@ export default async function MarketPage({
         </header>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredPost.map((post) => (
-            <PostCard key={post._id} post={Object.freeze(post)} />
+            <PostCard key={post._id} post={Object.freeze(post)} score={score} />
           ))}
         </div>
       </main>
