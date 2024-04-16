@@ -11,6 +11,19 @@ import { PostDisplay } from "@/app/market/page";
 import ViewDetails from "@/app/profile/ViewDetails";
 import ViewOffer from "@/app/profile/ViewOffer";
 import ViewOfferSell from "@/app/profile/ViewOfferSell";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { TrashIcon } from "lucide-react";
+import { Button } from "../ui/button";
+import dbConnect from "@/lib/dbConnect";
+import Post from "@/models/Post";
+import { revalidatePath } from "next/cache";
+
 /**
  * Responsible for rendering a user display, showing the user's avatar and name.
  *
@@ -61,7 +74,29 @@ export default function PostCardUser({
           />
         </div>
         <div className="px-4 pt-2 space-y-2">
-          <CardTitle>{post.name}</CardTitle>
+          <CardTitle className="flex items-center">
+            <span className="grow">{post.name}</span>
+            <Dialog>
+              <DialogTrigger asChild>
+                <TrashIcon />
+              </DialogTrigger>
+              <DialogContent>
+                <DialogTitle>Delete Post</DialogTitle>
+                <p>Are you sure you want to delete this post?</p>
+                <form
+                  action={async () => {
+                    "use server";
+                    await dbConnect();
+                    await Post.findByIdAndDelete(post._id);
+                    revalidatePath("/profile");
+                  }}>
+                  <Button type="submit" variant="destructive">
+                    Delete
+                  </Button>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </CardTitle>
           <UserDisplay sellerName={post.seller_name} />
           <CardDescription className="line-clamp-3">
             {post.description}
