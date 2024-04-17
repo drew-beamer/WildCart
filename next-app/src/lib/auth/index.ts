@@ -46,6 +46,7 @@ export const {
                 _id: userId,
                 name: profile.name as string,
                 email: profile.email as string,
+                score: 0,
                 buy_list: [],
                 sell_list: [],
               }).save();
