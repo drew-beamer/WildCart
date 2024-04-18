@@ -10,6 +10,20 @@ import Image from "next/image";
 import { PostDisplay } from "@/app/market/page";
 import ViewDetails from "@/app/profile/ViewDetails";
 import ViewOffer from "@/app/profile/ViewOffer";
+import ViewOfferSell from "@/app/profile/ViewOfferSell";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { TrashIcon } from "lucide-react";
+import { Button } from "../ui/button";
+import dbConnect from "@/lib/dbConnect";
+import Post from "@/models/Post";
+import { revalidatePath } from "next/cache";
+
 /**
  * Responsible for rendering a user display, showing the user's avatar and name.
  *
@@ -17,7 +31,7 @@ import ViewOffer from "@/app/profile/ViewOffer";
  *
  * @returns a user display, for use in the post card
  */
-export function UserDisplay({ sellerName }: { sellerName: string }) {
+export function UserDisplay({ sellerName, userScore }: { sellerName: string, userScore: number}) {
   return (
     <div className="flex items-center space-x-2 leading-tight">
       <Avatar>
@@ -29,7 +43,7 @@ export function UserDisplay({ sellerName }: { sellerName: string }) {
       </Avatar>
       <div>
         <p>{sellerName}</p>
-        <p className="text-xs">Level 40</p>
+        <p className="text-xs">Level {userScore}</p>
       </div>
     </div>
   );
@@ -43,9 +57,12 @@ export function UserDisplay({ sellerName }: { sellerName: string }) {
  *
  * @returns a card that represents a post, for use in the market page
  */
-export default function PostCardUser({
-  post,
-}: Readonly<{ post: PostDisplay }>) {
+
+interface PostCardUserProps {
+  post: Readonly<PostDisplay>;
+  score: number; 
+}
+export default function PostCardUser({ post, score }: PostCardUserProps) {
   const imageUrl = `data:image/jpeg;base64,${post.picture.toString("base64")}`;
 
   return (
@@ -60,18 +77,52 @@ export default function PostCardUser({
           />
         </div>
         <div className="px-4 pt-2 space-y-2">
-          <CardTitle>{post.name}</CardTitle>
-          <UserDisplay sellerName={post.seller_name} />
+          <CardTitle className="flex items-center">
+            <span className="grow">{post.name}</span>
+            <Dialog>
+              <DialogTrigger asChild>
+                <TrashIcon />
+              </DialogTrigger>
+              <DialogContent>
+                <DialogTitle>Delete Post</DialogTitle>
+                <p>Are you sure you want to delete this post?</p>
+                <form
+                  action={async () => {
+                    "use server";
+                    await dbConnect();
+                    await Post.findByIdAndDelete(post._id);
+                    revalidatePath("/profile");
+                  }}>
+                  <Button type="submit" variant="destructive">
+                    Delete
+                  </Button>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </CardTitle>
+          <UserDisplay sellerName={post.seller_name} userScore={score}/>
           <CardDescription className="line-clamp-3">
             {post.description}
           </CardDescription>
         </div>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2 gap-2 mt-4">
-          <ViewOffer />
-          <ViewDetails post={post} />
-        </div>
+        <>
+          {post.trade_mode === "Trade" && (
+            <div className="grid grid-cols-2 gap-2 mt-4">
+              <ViewOffer post={post} />
+              <ViewDetails post={post} />
+            </div>
+          )}
+        </>
+        <>
+          {post.trade_mode === "Sell" && (
+            <div className="grid grid-cols-2 gap-2 mt-4">
+              <ViewOfferSell post={post} />
+              <ViewDetails post={post} />
+            </div>
+          )}
+        </>
       </CardContent>
     </Card>
   );

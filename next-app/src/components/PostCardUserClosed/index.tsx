@@ -8,9 +8,7 @@ import {
 } from "@/components/ui/card";
 import Image from "next/image";
 import { PostDisplay } from "@/app/market/page";
-import CreateOffer from "@/app/market/CreateOffer";
 import ViewDetails from "@/app/profile/ViewDetails";
-import CreateOfferSell from "@/app/market/CreateOfferSell";
 /**
  * Responsible for rendering a user display, showing the user's avatar and name.
  *
@@ -18,7 +16,7 @@ import CreateOfferSell from "@/app/market/CreateOfferSell";
  *
  * @returns a user display, for use in the post card
  */
-export function UserDisplay({ sellerName, userScore }: { sellerName: string, userScore: number }) {
+export function UserDisplay({ sellerName }: { sellerName: string }) {
   return (
     <div className="flex items-center space-x-2 leading-tight">
       <Avatar>
@@ -28,11 +26,9 @@ export function UserDisplay({ sellerName, userScore }: { sellerName: string, use
             .reduce((initials, name) => initials + name[0], "")}
         </AvatarFallback>
       </Avatar>
-      {/* TODO: display data here */}
       <div>
         <p>{sellerName}</p>
-        <p className="text-xs">Level {getLevelFromScore(userScore)}</p>
-        <p className="text-xs">{(userScore/10)} orders</p>
+        
       </div>
     </div>
   );
@@ -46,15 +42,10 @@ export function UserDisplay({ sellerName, userScore }: { sellerName: string, use
  *
  * @returns a card that represents a post, for use in the market page
  */
-interface PostCardProps {
-  post: Readonly<PostDisplay>;
-  score: number; 
-}
-
-export default function PostCard({ post, score }: PostCardProps) {
-/*export default function PostCard({ post }: Readonly<{ post: PostDisplay }>, {score}: Readonly<{score: number}>) {*/
+export default function PostCardUser({
+  post,
+}: Readonly<{ post: PostDisplay }>) {
   const imageUrl = `data:image/jpeg;base64,${post.picture.toString("base64")}`;
-  
 
   return (
     <Card className="flex flex-col">
@@ -68,46 +59,18 @@ export default function PostCard({ post, score }: PostCardProps) {
           />
         </div>
         <div className="px-4 pt-2 space-y-2">
-          <CardTitle>{post.name}</CardTitle> 
-          <UserDisplay sellerName={post.seller_name} userScore={score} />
+          <CardTitle>{post.name}</CardTitle>
+          <UserDisplay sellerName={post.seller_name} />
           <CardDescription className="line-clamp-3">
             {post.description}
           </CardDescription>
         </div>
       </CardHeader>
       <CardContent>
-        <>
-          {post.trade_mode === "Trade" && (
-            <div className="grid grid-cols-2 gap-2 mt-4">
-              <CreateOffer
-                postId={post._id.toString()}
-                sellerId={post.seller_id.toString()}
-              />
-              <ViewDetails post={post} />
-            </div>
-          )}
-        </>
-        <>
-          {post.trade_mode === "Sell" && (
-            <div className="grid grid-cols-2 gap-2 mt-4">
-              <CreateOfferSell
-                postId={post._id.toString()}
-                sellerId={post.seller_id.toString()}
-              />
-              <ViewDetails post={post} />
-            </div>
-          )}
-        </>
+        <div className="grid grid-cols-1 gap-2 mt-4">
+          <ViewDetails post={post} />
+        </div>
       </CardContent>
     </Card>
   );
-}
-
-function getLevelFromScore(userScore: number) {
-  if (userScore < 10) return 1;
-  if (userScore < 30) return 2;
-  if (userScore < 80) return 3;
-  if (userScore < 160) return 4;
-  
-  return 5; 
 }
