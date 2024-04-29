@@ -1,8 +1,8 @@
-# WildCart
+# 🐱🛒 WildCart 🛒🐱 
 
 ## Description
 
-WildCart is a platform for Davidson College students to trade or purchase items from each other. Safety and security are out top priorities, and we are working on solutions to ensure trust within our community.
+WildCart is a platform for Davidson College students to trade or purchase items from each other. Safety and security are out top priorities, and we are working on solutions to ensure trust within our community. WildCart functions by having users create posts, which they can mark if they are interested in selling or trading. Users of the platform can then make offers on these posts. The poster can view these offers, pick the one most appealing to them, and be put in contact with the offerer.
 
 ### Motivation
 
@@ -40,7 +40,7 @@ After setting up the mongo environment, create a .txt file called `bad-words.txt
 2. Navigate to the `next-app` directory, and run `npm install` to install dependencies
 3. Run `npm run dev` to start the development server
 
-## Team
+## Team/Credits
 
 - **Product Manager**: Toffy
 - **Scrum Master**: Drew
