@@ -8,6 +8,19 @@ WildCart is a platform for Davidson College students to trade or purchase items 
 
 We noticed how much waste from reusable items is generated at the end of each semester during move-out. We want to provide a platform where people can exchange items they no longer want/need for items they do want/need. Second, we wanted to create a platform enabling Davidson College students to trade with each other in a safe and secure manner. As scams are seemiingly prevelant on other, more general platforms, we seek to provide a solution based on trust and community.
 
+### Screenshots
+### Main User Page
+<img width="769" alt="截屏2024-09-01 下午3 50 09" src="https://github.com/user-attachments/assets/00e8646a-a25d-4910-8b08-8ff0a09b4584">\
+
+### Market Page
+<img width="769" alt="截屏2024-09-01 下午3 50 25" src="https://github.com/user-attachments/assets/b98c29f5-2454-48f9-b9e4-6c0e205c7d50">\
+
+### Post Creation Form
+<img width="300" alt="截屏2024-09-01 下午3 50 47" src="https://github.com/user-attachments/assets/3347224c-4c3b-4942-861b-7038d42983c6">\
+
+### Trade Offer Form
+<img width="300" alt="截屏2024-09-01 下午3 51 03" src="https://github.com/user-attachments/assets/8c231b09-4e00-4a3b-bd62-cddf86539cbd">\
+
 ## Installation
 
 ### Prerequisites
